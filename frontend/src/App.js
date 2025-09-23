@@ -198,7 +198,12 @@ function SurahPage() {
   const [query, setQuery] = useState("");
   const firstMatchRef = useRef(null);
   const { audioRef, load, play, pause, playing, src, speed, setSpeed } = useAudio();
-  const [reciter, setReciter] = useState(RECITERS.find(r => r.key === 'alafasy'));
+  // preferences
+  const [reciter, setReciter] = useState(() => {
+    const saved = localStorage.getItem('quran.reciter');
+    return saved ? JSON.parse(saved) : RECITERS.find(r => r.key === 'alafasy');
+  });
+  const [bitrate, setBitrate] = useState(() => localStorage.getItem('quran.bitrate') || '128'); // '64' or '128'
   const [autoScroll, setAutoScroll] = useState(true);
   const [continuous, setContinuous] = useState(true);
   const [repeatMode, setRepeatMode] = useState("off"); // off | one | ab | all
