@@ -107,7 +107,10 @@ function useAudio() {
   const [speed, setSpeed] = useState(1);
 
   useEffect(() => {
-    if (!audioRef.current) audioRef.current = new Audio();
+    if (!audioRef.current) {
+      audioRef.current = new Audio();
+      audioRef.current.preload = 'auto';
+    }
     return () => {
       if (audioRef.current) {
         audioRef.current.pause();
