@@ -201,6 +201,30 @@ function SurahPage() {
     setCurrentAyah(ayah.numberInSurah);
   };
 
+  // auto-scroll to the active ayah while playing
+  useEffect(() => {
+    if (!autoScroll || currentAyah == null) return;
+    const el = document.querySelector(`[data-testid="ayah-${currentAyah}"]`);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, [currentAyah, autoScroll]);
+
+  // continuous play: when an audio ends, move to next ayah
+  useEffect(() => {
+    if (!audioRef.current) return;
+    const handler = () => {
+      if (!continuous || !english?.ayahs?.length) return;
+      const idx = english.ayahs.findIndex(a => a.numberInSurah === currentAyah);
+      const next = english.ayahs[idx + 1];
+      if (next) {
+        onPlayAyah(next);
+      }
+    };
+    audioRef.current.addEventListener('ended', handler);
+    return () => {
+      if (audioRef.current) audioRef.current.removeEventListener('ended', handler);
+    };
+  }, [audioRef, currentAyah, continuous, english]);
+
   const toggle = () => { if (playing) pause(); else play(); };
 
   const matches = useMemo(() => {
