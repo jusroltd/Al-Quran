@@ -226,7 +226,28 @@ function SurahPage() {
     return () => { mounted = false; };
   }, [api, number]);
 
-  const buildAudioUrl = (ayahNumberGlobal) => `https://cdn.islamic.network/quran/audio/128/ar.alafasy/${ayahNumberGlobal}.mp3`;
+  const buildAudioUrl = (ayahNumberGlobal) => {
+    if (!reciter) return `https://cdn.islamic.network/quran/audio/128/ar.alafasy/${ayahNumberGlobal}.mp3`;
+    if (reciter.provider === 'islamic') {
+      return `https://cdn.islamic.network/quran/audio/128/${reciter.code}/${ayahNumberGlobal}.mp3`;
+    }
+    if (reciter.provider === 'everyayah') {
+      // needs 3-digit surah and ayah; we have global ayah number only here, but for per-ayah mapping we rely on arabic/english arrays
+      // We can compute 3-digit tokens using current surah context
+      const surahNum = english?.number || Number(number);
+      const surahStr = String(surahNum).padStart(3, '0');
+      // Find ayah within surah by global number
+      const item = english?.ayahs?.find(a => a.number === ayahNumberGlobal);
+      const ayahStr = String(item ? item.numberInSurah : 1).padStart(3, '0');
+      return `https://everyayah.com/data/${reciter.code}/${surahStr}${ayahStr}.mp3`;
+    }
+    if (reciter.provider === 'match-islamic') {
+      // map to closest known code from islamic.network by matching keyword
+      const hint = reciter.match || 'alafasy';
+      return `https://cdn.islamic.network/quran/audio/128/ar.${hint}/${ayahNumberGlobal}.mp3`;
+    }
+    return `https://cdn.islamic.network/quran/audio/128/ar.alafasy/${ayahNumberGlobal}.mp3`;
+  };
 
   const preloadNext = (currNumberInSurah) => {
     if (!english?.ayahs) return;
