@@ -393,13 +393,23 @@ function SurahPage() {
 
           <div className="n-inset search" style={{ borderRadius: 18, marginBottom: 12, justifyContent: 'space-between' }}>
             <div className="subtitle">Reciter</div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              {reciter ? (
-                <Avatar className="n-inset" style={{ borderRadius: '50%' }}>
-                  <AvatarImage src={reciter.img} alt={reciter.name} />
-                  <AvatarFallback>{reciter.name?.slice(0,2).toUpperCase()}</AvatarFallback>
-                </Avatar>
-              ) : null}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div>
+                      {reciter ? (
+                        <Avatar className="n-inset" style={{ borderRadius: '50%' }}>
+                          <AvatarImage src={reciter.img} alt={reciter.name} />
+                          <AvatarFallback>{reciter.name?.slice(0,2).toUpperCase()}</AvatarFallback>
+                        </Avatar>
+                      ) : null}
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>{reciter?.name}</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+
               <Select value={reciter?.key} onValueChange={(key) => setReciter(RECITERS.find(r => r.key === key))}>
                 <SelectTrigger data-testid="reciter-select-top" className="n-inset" style={{ borderRadius: 12, minWidth: 240 }}>
                   <SelectValue>{reciter?.name}</SelectValue>
@@ -410,6 +420,19 @@ function SurahPage() {
                   ))}
                 </SelectContent>
               </Select>
+
+              <div className="badge-soft" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span className="subtitle">Bitrate</span>
+                <Select value={bitrate} onValueChange={setBitrate}>
+                  <SelectTrigger data-testid="bitrate-select" className="n-inset" style={{ borderRadius: 12, minWidth: 90 }}>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="n-card">
+                    <SelectItem value="64" data-testid="bitrate-64">64 kbps</SelectItem>
+                    <SelectItem value="128" data-testid="bitrate-128">128 kbps</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
 
