@@ -9,6 +9,30 @@ import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from ".
 import { Progress } from "./components/ui/progress";
 import { Avatar, AvatarImage, AvatarFallback } from "./components/ui/avatar";
 
+// Top 20 Reciters (name, avatar, provider, code or match hint)
+const RECITERS = [
+  { key: 'abdul-basit', name: 'Abdul Basit Abdul Samad', img: 'https://upload.wikimedia.org/wikipedia/commons/7/75/%D8%B9%D8%A8%D8%AF%D8%A7%D9%84%D8%A8%D8%A7%D8%B3%D8%B7_%D8%B9%D8%A8%D8%AF_%D8%A7%D9%84%D8%B5%D9%85%D8%AF_%D8%B1%D8%AD%D9%85%D9%87_%D8%A7%D9%84%D9%84%D9%87.jpg', provider: 'match-islamic', match: 'basit' },
+  { key: 'alafasy', name: 'Mishary Rashid Alafasy', img: 'https://artwork.qurancentral.com/mishary-rashid-alafasy.jpg', provider: 'islamic', code: 'ar.alafasy' },
+  { key: 'sudais', name: 'Abdul Rahman Al-Sudais', img: 'https://quranicaudio.com/images/7.jpg', provider: 'match-islamic', match: 'sudais' },
+  { key: 'hussary', name: 'Mahmoud Khalil Al-Hussary', img: 'https://www.assabile.com/media/person/200x256/mahmoud-khalil-al-hussary.png', provider: 'everyayah', code: 'Hussary_128kbps' },
+  { key: 'minshawi', name: 'Muhammad Siddiq Al-Minshawi', img: 'https://everyayah.com/data/status/128/minshawi.jpg', provider: 'everyayah', code: 'Minshawi_Murattal_128kbps' },
+  { key: 'ghamdi', name: 'Saad Al-Ghamdi', img: 'https://quranicaudio.com/images/8.jpg', provider: 'match-islamic', match: 'ghamdi' },
+  { key: 'maher', name: 'Maher Al-Muaiqly', img: 'https://quranicaudio.com/images/9.jpg', provider: 'match-islamic', match: 'muaiq' },
+  { key: 'shuraim', name: 'Saud Al-Shuraim', img: 'https://quranicaudio.com/images/4.jpg', provider: 'match-islamic', match: 'shur' },
+  { key: 'shatri', name: 'Abu Bakr Al-Shatri', img: 'https://alquran-api.pages.dev/images/abu-bakr-al-shatri.jpg', provider: 'match-islamic', match: 'shatri' },
+  { key: 'ajamy', name: 'Ahmed Al-Ajamy', img: 'https://everyayah.com/data/status/128/ajamy.jpg', provider: 'everyayah', code: 'Ajamy_128kbps' },
+  { key: 'hudhaify', name: 'Ali Al-Hudhaify', img: 'https://quranicaudio.com/images/11.jpg', provider: 'match-islamic', match: 'hudha' },
+  { key: 'dosari', name: 'Yasser Al-Dosari', img: 'https://quranicaudio.com/images/12.jpg', provider: 'match-islamic', match: 'dosar' },
+  { key: 'ayyub', name: 'Muhammad Ayyub', img: 'https://everyayah.com/data/status/128/ayyub.jpg', provider: 'everyayah', code: 'Ayyub_128kbps' },
+  { key: 'qatami', name: 'Nasser Al-Qatami', img: 'https://quranicaudio.com/images/13.jpg', provider: 'match-islamic', match: 'qatami' },
+  { key: 'budair', name: 'Salah Al-Budair', img: 'https://quranicaudio.com/images/14.jpg', provider: 'match-islamic', match: 'budair' },
+  { key: 'mustafa-ismail', name: 'Mustafa Ismail', img: 'https://everyayah.com/data/status/128/mustafa_ismail.jpg', provider: 'everyayah', code: 'MustafaIsmail_128kbps' },
+  { key: 'fares-abbad', name: 'Fares Abbad', img: 'https://quranicaudio.com/images/15.jpg', provider: 'match-islamic', match: 'far' },
+  { key: 'hani-rifai', name: 'Hani Rifai', img: 'https://quranicaudio.com/images/16.jpg', provider: 'match-islamic', match: 'rifai' },
+  { key: 'basfar', name: 'Abdullah Basfar', img: 'https://everyayah.com/data/status/128/basfar.jpg', provider: 'everyayah', code: 'Basfar_192kbps' },
+  { key: 'abdullah-awad', name: 'Abdullah Awad Al-Juhany', img: 'https://quranicaudio.com/images/10.jpg', provider: 'match-islamic', match: 'juhany' },
+];
+
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
