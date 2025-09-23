@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route, Link, useNavigate, useParams } from "reac
 import axios from "axios";
 import { Play, Pause, ChevronLeft } from "lucide-react";
 import { Slider } from "./components/ui/slider";
+import { Switch } from "./components/ui/switch";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
