@@ -173,6 +173,10 @@ function SurahPage() {
   const { audioRef, load, play, pause, playing, src, speed, setSpeed } = useAudio();
   const [autoScroll, setAutoScroll] = useState(true);
   const [continuous, setContinuous] = useState(true);
+  const [repeatMode, setRepeatMode] = useState("off"); // off | one | ab | all
+  const [aPoint, setAPoint] = useState(null); // ayah numberInSurah
+  const [bPoint, setBPoint] = useState(null);
+  const preloadedRef = useRef(null); // next audio element for preload
 
   useEffect(() => {
     let mounted = true;
