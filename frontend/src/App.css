@@ -156,6 +156,7 @@ body {
   display: flex;
   gap: 12px;
   align-items: center;
+  z-index: 50;
 }
 
 .icon-btn {
