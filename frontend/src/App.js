@@ -6,6 +6,7 @@ import { Play, Pause, ChevronLeft } from "lucide-react";
 import { Slider } from "./components/ui/slider";
 import { Switch } from "./components/ui/switch";
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "./components/ui/select";
+import { Progress } from "./components/ui/progress";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
