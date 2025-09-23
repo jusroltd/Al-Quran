@@ -228,22 +228,50 @@ function SurahPage() {
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }, [currentAyah, autoScroll]);
 
-  // continuous play: when an audio ends, move to next ayah
+  // handle end: repeat modes + continuous + use preloaded buffer when available
   useEffect(() => {
     if (!audioRef.current) return;
     const handler = () => {
-      if (!continuous || !english?.ayahs?.length) return;
+      if (!english?.ayahs?.length) return;
       const idx = english.ayahs.findIndex(a => a.numberInSurah === currentAyah);
+      const currAyah = english.ayahs[idx];
+
+      // Repeat one
+      if (repeatMode === 'one') {
+        onPlayAyah(currAyah);
+        return;
+      }
+
+      // Repeat A-B range
+      if (repeatMode === 'ab' && aPoint && bPoint) {
+        const nextNum = currentAyah >= bPoint ? aPoint : currentAyah + 1;
+        const next = english.ayahs.find(a => a.numberInSurah === nextNum);
+        if (next) { onPlayAyah(next); }
+        return;
+      }
+
+      // Continuous / repeat all
       const next = english.ayahs[idx + 1];
       if (next) {
-        onPlayAyah(next);
+        // if we preloaded, swap its buffer in for instant start
+        if (preloadedRef.current && preloadedRef.current.src.endsWith(`/${next.number}.mp3`)) {
+          audioRef.current.src = preloadedRef.current.src;
+          audioRef.current.playbackRate = speed;
+          audioRef.current.play();
+          setCurrentAyah(next.numberInSurah);
+          preloadNext(next.numberInSurah);
+        } else if (continuous) {
+          onPlayAyah(next);
+        }
+      } else if (repeatMode === 'all') {
+        const first = english.ayahs[0];
+        onPlayAyah(first);
       }
     };
+
     audioRef.current.addEventListener('ended', handler);
-    return () => {
-      if (audioRef.current) audioRef.current.removeEventListener('ended', handler);
-    };
-  }, [audioRef, currentAyah, continuous, english]);
+    return () => { if (audioRef.current) audioRef.current.removeEventListener('ended', handler); };
+  }, [audioRef, currentAyah, english, repeatMode, aPoint, bPoint, continuous, speed]);
 
   const toggle = () => { if (playing) pause(); else play(); };
 
