@@ -1,50 +1,247 @@
-import { useEffect } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import "./App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Link, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
+import { Play, Pause, ChevronLeft } from "lucide-react";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
-const Home = () => {
-  const helloWorldApi = async () => {
-    try {
-      const response = await axios.get(`${API}/`);
-      console.log(response.data.message);
-    } catch (e) {
-      console.error(e, `errored out requesting / api`);
+function useApi() {
+  const api = useMemo(() => {
+    const instance = axios.create({ baseURL: API });
+    return instance;
+  }, []);
+  return api;
+}
+
+function Header() {
+  const navigate = useNavigate();
+  return (
+    <div className="header n-card container" data-testid="app-header">
+      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        <button aria-label="Back" className="n-btn icon-btn" data-testid="nav-back-button" onClick={() => navigate(-1)}>
+          <ChevronLeft size={18} />
+        </button>
+        <Link to="/" className="hidden-border" data-testid="brand-link" style={{ textDecoration: "none", color: "inherit" }}>
+          <strong>Quran • Neumorph</strong>
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+function SurahListPage() {
+  const api = useApi();
+  const [surahs, setSurahs] = useState([]);
+  const [q, setQ] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const { data } = await api.get("/quran/surahs");
+        if (mounted) setSurahs(Array.isArray(data) ? data : data?.data || []);
+      } catch (e) {
+        console.error("Failed to load surahs", e);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    })();
+    return () => { mounted = false; };
+  }, [api]);
+
+  const filtered = useMemo(() => {
+    return surahs.filter((s) => {
+      const hay = `${s.englishName} ${s.name} ${s.englishNameTranslation}`.toLowerCase();
+      return hay.includes(q.toLowerCase());
+    });
+  }, [surahs, q]);
+
+  return (
+    <div className="container" data-testid="surah-list-page">
+      <div className="n-inset search" style={{ borderRadius: 18, marginBottom: 16 }}>
+        <input
+          className="input"
+          placeholder="Search surah..."
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          data-testid="surah-search-input"
+        />
+      </div>
+
+      {loading ? (
+        <div className="grid">
+          {Array.from({ length: 12 }).map((_, i) => (
+            <div key={i} className="n-card surah-card skeleton" data-testid={`surah-card-skel-${i}`}
+              style={{ height: 110 }}></div>
+          ))}
+        </div>
+      ) : (
+        <div className="grid">
+          {filtered.map((s) => (
+            <Link to={`/surah/${s.number}`} key={s.number} className="n-card surah-card" data-testid={`surah-card-${s.number}`} style={{ textDecoration: "none", color: "inherit" }}>
+              <div className="badge" aria-label="surah-meta">
+                <span>#{s.number}</span>
+                <span>Ayat {s.numberOfAyahs}</span>
+                <span>{s.revelationType}</span>
+              </div>
+              <div className="surah-title">{s.englishName}</div>
+              <div className="subtitle">{s.englishNameTranslation}</div>
+              <div className="arabic">{s.name}</div>
+            </Link>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function useAudio() {
+  const audioRef = useRef(null);
+  const [playing, setPlaying] = useState(false);
+  const [src, setSrc] = useState("");
+
+  useEffect(() => {
+    if (!audioRef.current) audioRef.current = new Audio();
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+    };
+  }, []);
+
+  const load = (url) => {
+    if (!audioRef.current) audioRef.current = new Audio();
+    if (src !== url) {
+      setSrc(url);
+      audioRef.current.src = url;
     }
   };
 
+  const play = async () => {
+    try {
+      await audioRef.current.play();
+      setPlaying(true);
+    } catch (e) {
+      console.warn("autoplay blocked", e);
+    }
+  };
+
+  const pause = () => {
+    audioRef.current.pause();
+    setPlaying(false);
+  };
+
+  return { audioRef, load, play, pause, playing, src };
+}
+
+function SurahPage() {
+  const api = useApi();
+  const { number } = useParams();
+  const [arabic, setArabic] = useState(null);
+  const [english, setEnglish] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [currentAyah, setCurrentAyah] = useState(null);
+  const { load, play, pause, playing, src } = useAudio();
+
   useEffect(() => {
-    helloWorldApi();
-  }, []);
+    let mounted = true;
+    setLoading(true);
+    (async () => {
+      try {
+        const [{ data: en }, { data: ar }] = await Promise.all([
+          api.get(`/quran/surah/${number}?edition=en.asad`),
+          api.get(`/quran/surah/${number}/arabic?edition=quran-uthmani`),
+        ]);
+        if (!mounted) return;
+        setEnglish(en?.data);
+        setArabic(ar?.data);
+      } catch (e) {
+        console.error("Failed to load surah", e);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    })();
+    return () => { mounted = false; };
+  }, [api, number]);
+
+  const onPlayAyah = (ayah) => {
+    // Using Islamic Network CDN for per-ayah audio: /audio/128/edition/ayah.mp3
+    // Choose default edition: ar.alafasy (Mishary Al-Afasy individual ayah)
+    const audioUrl = `https://cdn.islamic.network/quran/audio/128/ar.alafasy/${ayah.number}.mp3`;
+    load(audioUrl);
+    play();
+    setCurrentAyah(ayah.numberInSurah);
+  };
+
+  const toggle = () => {
+    if (playing) pause(); else play();
+  };
 
   return (
-    <div>
-      <header className="App-header">
-        <a
-          className="App-link"
-          href="https://emergent.sh"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img src="https://avatars.githubusercontent.com/in/1201222?s=120&u=2686cf91179bbafbc7a71bfbc43004cf9ae1acea&v=4" />
-        </a>
-        <p className="mt-5">Building something incredible ~!</p>
-      </header>
+    <div className="container" data-testid="surah-page">
+      {loading || !arabic || !english ? (
+        <div className="n-card" style={{ padding: 18 }} data-testid="surah-skeleton">
+          Loading surah...
+        </div>
+      ) : (
+        <div className="n-card" style={{ padding: 18 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+            <div>
+              <div className="surah-title" data-testid="surah-name">{english.englishName} · {arabic.name}</div>
+              <div className="subtitle" data-testid="surah-meta">{english.englishNameTranslation} · {english.revelationType} · {english.numberOfAyahs} ayat</div>
+            </div>
+            <Link to="/" className="n-btn" data-testid="back-to-list">Back</Link>
+          </div>
+
+          <div style={{ display: "grid", gap: 10 }}>
+            {english.ayahs.map((enAyah, i) => {
+              const arAyah = arabic.ayahs[i];
+              const active = currentAyah === enAyah.numberInSurah;
+              return (
+                <div key={enAyah.number} className={`n-inset ayah ${active ? 'skeleton' : ''}`} data-testid={`ayah-${enAyah.numberInSurah}`}>
+                  <div className="row">
+                    <div>
+                      <div className="arabic" dir="rtl">{arAyah.text}</div>
+                      <div style={{ height: 8 }} />
+                      <div>{enAyah.text}</div>
+                      <div className="subtitle">Ayah {enAyah.numberInSurah}</div>
+                    </div>
+                    <div>
+                      <button className="n-btn icon-btn" data-testid={`ayah-play-${enAyah.numberInSurah}`} onClick={() => onPlayAyah(enAyah)} aria-label="Play ayah">
+                        <Play size={18} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {src ? (
+        <div className="n-card player" data-testid="mini-player">
+          <button className="n-btn icon-btn" onClick={toggle} data-testid="mini-player-toggle">
+            {playing ? <Pause size={18} /> : <Play size={18} />}
+          </button>
+          <div className="subtitle">{playing ? 'Playing' : 'Paused'} · Mishary Al-Afasy</div>
+        </div>
+      ) : null}
     </div>
   );
-};
+}
 
 function App() {
   return (
     <div className="App">
       <BrowserRouter>
+        <Header />
         <Routes>
-          <Route path="/" element={<Home />}>
-            <Route index element={<Home />} />
-          </Route>
+          <Route path="/" element={<SurahListPage />} />
+          <Route path="/surah/:number" element={<SurahPage />} />
         </Routes>
       </BrowserRouter>
     </div>
