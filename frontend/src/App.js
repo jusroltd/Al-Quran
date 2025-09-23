@@ -204,6 +204,7 @@ function SurahPage() {
   const [aPoint, setAPoint] = useState(null); // ayah numberInSurah
   const [bPoint, setBPoint] = useState(null);
   const preloadedRef = useRef(null); // next audio element for preload
+  const [lastGlobalAyah, setLastGlobalAyah] = useState(null);
 
   useEffect(() => {
     let mounted = true;
