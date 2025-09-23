@@ -289,6 +289,16 @@ function SurahPage() {
     }
   }, [query]);
 
+  // force re-render to update progress bar periodically while playing
+  const [, setTick] = useState(0);
+  useEffect(() => {
+    let id;
+    if (playing) {
+      id = setInterval(() => setTick((t) => t + 1), 500);
+    }
+    return () => { if (id) clearInterval(id); };
+  }, [playing]);
+
   return (
     <div className="container" data-testid="surah-page">
       {loading || !arabic || !english ? (
