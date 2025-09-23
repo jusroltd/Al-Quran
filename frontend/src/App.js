@@ -3,6 +3,7 @@ import "./App.css";
 import { BrowserRouter, Routes, Route, Link, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { Play, Pause, ChevronLeft } from "lucide-react";
+import { Slider } from "./components/ui/slider";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -102,6 +103,7 @@ function useAudio() {
   const audioRef = useRef(null);
   const [playing, setPlaying] = useState(false);
   const [src, setSrc] = useState("");
+  const [speed, setSpeed] = useState(1);
 
   useEffect(() => {
     if (!audioRef.current) audioRef.current = new Audio();
@@ -112,11 +114,18 @@ function useAudio() {
     };
   }, []);
 
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.playbackRate = speed;
+    }
+  }, [speed]);
+
   const load = (url) => {
     if (!audioRef.current) audioRef.current = new Audio();
     if (src !== url) {
       setSrc(url);
       audioRef.current.src = url;
+      audioRef.current.playbackRate = speed;
     }
   };
 
@@ -134,7 +143,17 @@ function useAudio() {
     setPlaying(false);
   };
 
-  return { audioRef, load, play, pause, playing, src };
+  return { audioRef, load, play, pause, playing, src, speed, setSpeed };
+}
+
+function highlight(text, q) {
+  if (!q) return text;
+  const idx = text.toLowerCase().indexOf(q.toLowerCase());
+  if (idx === -1) return text;
+  const before = text.slice(0, idx);
+  const match = text.slice(idx, idx + q.length);
+  const after = text.slice(idx + q.length);
+  return (<span>{before}<mark>{match}</mark>{after}</span>);
 }
 
 function SurahPage() {
@@ -144,7 +163,9 @@ function SurahPage() {
   const [english, setEnglish] = useState(null);
   const [loading, setLoading] = useState(true);
   const [currentAyah, setCurrentAyah] = useState(null);
-  const { load, play, pause, playing, src } = useAudio();
+  const [query, setQuery] = useState("");
+  const firstMatchRef = useRef(null);
+  const { load, play, pause, playing, src, speed, setSpeed } = useAudio();
 
   useEffect(() => {
     let mounted = true;
@@ -168,17 +189,26 @@ function SurahPage() {
   }, [api, number]);
 
   const onPlayAyah = (ayah) => {
-    // Using Islamic Network CDN for per-ayah audio: /audio/128/edition/ayah.mp3
-    // Choose default edition: ar.alafasy (Mishary Al-Afasy individual ayah)
     const audioUrl = `https://cdn.islamic.network/quran/audio/128/ar.alafasy/${ayah.number}.mp3`;
     load(audioUrl);
     play();
     setCurrentAyah(ayah.numberInSurah);
   };
 
-  const toggle = () => {
-    if (playing) pause(); else play();
-  };
+  const toggle = () => { if (playing) pause(); else play(); };
+
+  const matches = useMemo(() => {
+    if (!english?.ayahs) return [];
+    if (!query) return english.ayahs.map((a) => a.numberInSurah);
+    const ql = query.toLowerCase();
+    return english.ayahs.filter(a => a.text.toLowerCase().includes(ql)).map(a => a.numberInSurah);
+  }, [english, query]);
+
+  useEffect(() => {
+    if (firstMatchRef.current) {
+      firstMatchRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, [query]);
 
   return (
     <div className="container" data-testid="surah-page">
@@ -196,17 +226,31 @@ function SurahPage() {
             <Link to="/" className="n-btn" data-testid="back-to-list">Back</Link>
           </div>
 
+          <div className="n-inset search" style={{ borderRadius: 18, marginBottom: 12 }}>
+            <input
+              className="input"
+              placeholder="Search within surah..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              data-testid="in-surah-search-input"
+            />
+            <div className="subtitle" data-testid="in-surah-match-count">{matches.length} matches</div>
+          </div>
+
           <div style={{ display: "grid", gap: 10 }}>
             {english.ayahs.map((enAyah, i) => {
+              const isMatch = matches.includes(enAyah.numberInSurah);
+              if (query && !isMatch) return null;
               const arAyah = arabic.ayahs[i];
               const active = currentAyah === enAyah.numberInSurah;
+              const refProp = (query && isMatch && !firstMatchRef.current) ? { ref: firstMatchRef } : {};
               return (
-                <div key={enAyah.number} className={`n-inset ayah ${active ? 'skeleton' : ''}`} data-testid={`ayah-${enAyah.numberInSurah}`}>
+                <div key={enAyah.number} {...refProp} className={`n-inset ayah ${active ? 'skeleton' : ''}`} data-testid={`ayah-${enAyah.numberInSurah}`}>
                   <div className="row">
                     <div>
                       <div className="arabic" dir="rtl">{arAyah.text}</div>
                       <div style={{ height: 8 }} />
-                      <div>{enAyah.text}</div>
+                      <div>{highlight(enAyah.text, query)}</div>
                       <div className="subtitle">Ayah {enAyah.numberInSurah}</div>
                     </div>
                     <div>
@@ -227,7 +271,18 @@ function SurahPage() {
           <button className="n-btn icon-btn" onClick={toggle} data-testid="mini-player-toggle">
             {playing ? <Pause size={18} /> : <Play size={18} />}
           </button>
-          <div className="subtitle">{playing ? 'Playing' : 'Paused'} · Mishary Al-Afasy</div>
+          <div className="subtitle" style={{ minWidth: 160 }}>{playing ? 'Playing' : 'Paused'} · Mishary Al-Afasy</div>
+          <div style={{ width: 160 }}>
+            <div className="subtitle" style={{ marginBottom: 6 }}>Speed {speed.toFixed(1)}x</div>
+            <Slider
+              data-testid="speed-slider"
+              min={0.5}
+              max={2}
+              step={0.1}
+              value={[speed]}
+              onValueChange={(v) => setSpeed(v[0])}
+            />
+          </div>
         </div>
       ) : null}
     </div>
