@@ -169,7 +169,9 @@ function SurahPage() {
   const [currentAyah, setCurrentAyah] = useState(null);
   const [query, setQuery] = useState("");
   const firstMatchRef = useRef(null);
-  const { load, play, pause, playing, src, speed, setSpeed } = useAudio();
+  const { audioRef, load, play, pause, playing, src, speed, setSpeed } = useAudio();
+  const [autoScroll, setAutoScroll] = useState(true);
+  const [continuous, setContinuous] = useState(true);
 
   useEffect(() => {
     let mounted = true;
