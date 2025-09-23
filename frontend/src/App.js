@@ -369,6 +369,26 @@ function SurahPage() {
             <label className="subtitle" htmlFor="continuous-switch">Continuous</label>
             <Switch id="continuous-switch" checked={continuous} onCheckedChange={setContinuous} data-testid="continuous-toggle" />
           </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 220 }}>
+            <label className="subtitle">Repeat</label>
+            <Select value={repeatMode} onValueChange={setRepeatMode}>
+              <SelectTrigger data-testid="repeat-mode-select" className="n-inset" style={{ borderRadius: 12 }}>
+                <SelectValue placeholder="Repeat" />
+              </SelectTrigger>
+              <SelectContent className="n-card">
+                <SelectItem value="off" data-testid="repeat-off">Off</SelectItem>
+                <SelectItem value="one" data-testid="repeat-one">Single Ayah</SelectItem>
+                <SelectItem value="ab" data-testid="repeat-ab">A–B Range</SelectItem>
+                <SelectItem value="all" data-testid="repeat-all">Whole Surah</SelectItem>
+              </SelectContent>
+            </Select>
+            {repeatMode === 'ab' ? (
+              <div style={{ display: 'flex', gap: 6 }}>
+                <button className="n-btn" data-testid="set-a-btn" onClick={() => setAPoint(currentAyah)}>Set A</button>
+                <button className="n-btn" data-testid="set-b-btn" onClick={() => setBPoint(currentAyah)}>Set B</button>
+              </div>
+            ) : null}
+          </div>
         </div>
       ) : null}
     </div>
