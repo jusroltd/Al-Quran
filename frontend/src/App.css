@@ -161,6 +161,13 @@ body {
   font-size: 0.9rem;
 }
 
+.badge-soft {
+  background: linear-gradient(145deg, #f2f2f2, #ffffff);
+  border-radius: 9999px;
+  padding: 6px 10px;
+  box-shadow: 4px 4px 8px var(--shadow-dark), -4px -4px 8px var(--shadow-light);
+}
+
 .player {
   position: fixed;
   left: 50%;
