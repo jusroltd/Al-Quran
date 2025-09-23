@@ -316,6 +316,13 @@ function SurahPage() {
           </div>
 
           <div style={{ display: "grid", gap: 10 }}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
+              <button className="n-btn" data-testid="jump-to-current" onClick={() => {
+                if (currentAyah == null) return;
+                const el = document.querySelector(`[data-testid="ayah-${currentAyah}"]`);
+                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              }}>Jump to Current</button>
+            </div>
             {english.ayahs.map((enAyah, i) => {
               const isMatch = matches.includes(enAyah.numberInSurah);
               if (query && !isMatch) return null;
