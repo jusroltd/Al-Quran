@@ -197,6 +197,7 @@ function SurahPage() {
   const [query, setQuery] = useState("");
   const firstMatchRef = useRef(null);
   const { audioRef, load, play, pause, playing, src, speed, setSpeed } = useAudio();
+  const [reciter, setReciter] = useState(RECITERS.find(r => r.key === 'alafasy'));
   const [autoScroll, setAutoScroll] = useState(true);
   const [continuous, setContinuous] = useState(true);
   const [repeatMode, setRepeatMode] = useState("off"); // off | one | ab | all
