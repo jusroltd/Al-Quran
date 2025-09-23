@@ -233,10 +233,19 @@ function SurahPage() {
     return () => { mounted = false; };
   }, [api, number]);
 
+  // persist preferences when changed
+  useEffect(() => { localStorage.setItem('quran.reciter', JSON.stringify(reciter)); }, [reciter]);
+  useEffect(() => { localStorage.setItem('quran.speed', String(speed)); }, [speed]);
+  useEffect(() => { localStorage.setItem('quran.repeatMode', repeatMode); }, [repeatMode]);
+  useEffect(() => { localStorage.setItem('quran.autoScroll', String(autoScroll)); }, [autoScroll]);
+  useEffect(() => { localStorage.setItem('quran.continuous', String(continuous)); }, [continuous]);
+  useEffect(() => { localStorage.setItem('quran.bitrate', bitrate); }, [bitrate]);
+
   const buildAudioUrl = (ayahNumberGlobal) => {
-    if (!reciter) return `https://cdn.islamic.network/quran/audio/128/ar.alafasy/${ayahNumberGlobal}.mp3`;
+    const rate = bitrate === '64' ? '64' : '128';
+    if (!reciter) return `https://cdn.islamic.network/quran/audio/${rate}/ar.alafasy/${ayahNumberGlobal}.mp3`;
     if (reciter.provider === 'islamic') {
-      return `https://cdn.islamic.network/quran/audio/128/${reciter.code}/${ayahNumberGlobal}.mp3`;
+      return `https://cdn.islamic.network/quran/audio/${rate}/${reciter.code}/${ayahNumberGlobal}.mp3`;
     }
     if (reciter.provider === 'everyayah') {
       // needs 3-digit surah and ayah; we have global ayah number only here, but for per-ayah mapping we rely on arabic/english arrays
