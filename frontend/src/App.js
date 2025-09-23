@@ -204,9 +204,9 @@ function SurahPage() {
     return saved ? JSON.parse(saved) : RECITERS.find(r => r.key === 'alafasy');
   });
   const [bitrate, setBitrate] = useState(() => localStorage.getItem('quran.bitrate') || '128'); // '64' or '128'
-  const [autoScroll, setAutoScroll] = useState(true);
-  const [continuous, setContinuous] = useState(true);
-  const [repeatMode, setRepeatMode] = useState("off"); // off | one | ab | all
+  const [autoScroll, setAutoScroll] = useState(() => (localStorage.getItem('quran.autoScroll') ?? 'true') === 'true');
+  const [continuous, setContinuous] = useState(() => (localStorage.getItem('quran.continuous') ?? 'true') === 'true');
+  const [repeatMode, setRepeatMode] = useState(() => localStorage.getItem('quran.repeatMode') || "off"); // off | one | ab | all
   const [aPoint, setAPoint] = useState(null); // ayah numberInSurah
   const [bPoint, setBPoint] = useState(null);
   const preloadedRef = useRef(null); // next audio element for preload
