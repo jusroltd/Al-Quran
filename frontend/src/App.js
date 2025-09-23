@@ -375,6 +375,28 @@ function SurahPage() {
             <div className="subtitle" data-testid="in-surah-match-count">{matches.length} matches</div>
           </div>
 
+          <div className="n-inset search" style={{ borderRadius: 18, marginBottom: 12, justifyContent: 'space-between' }}>
+            <div className="subtitle">Reciter</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              {reciter ? (
+                <Avatar className="n-inset" style={{ borderRadius: '50%' }}>
+                  <AvatarImage src={reciter.img} alt={reciter.name} />
+                  <AvatarFallback>{reciter.name?.slice(0,2).toUpperCase()}</AvatarFallback>
+                </Avatar>
+              ) : null}
+              <Select value={reciter?.key} onValueChange={(key) => setReciter(RECITERS.find(r => r.key === key))}>
+                <SelectTrigger data-testid="reciter-select-top" className="n-inset" style={{ borderRadius: 12, minWidth: 240 }}>
+                  <SelectValue>{reciter?.name}</SelectValue>
+                </SelectTrigger>
+                <SelectContent className="n-card">
+                  {RECITERS.map(r => (
+                    <SelectItem key={r.key} value={r.key} data-testid={`reciter-top-${r.key}`}>{r.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
           <div style={{ display: "grid", gap: 10 }}>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
               <button className="n-btn" data-testid="jump-to-current" onClick={() => {
