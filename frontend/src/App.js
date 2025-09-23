@@ -416,7 +416,20 @@ function SurahPage() {
           </button>
           <div className="subtitle" style={{ minWidth: 160 }}>{playing ? 'Playing' : 'Paused'} · Mishary Al-Afasy</div>
           <div style={{ width: 200 }}>
-            <div className="subtitle" style={{ marginBottom: 6 }}>Speed {speed.toFixed(1)}x</div>
+            <div className="subtitle" style={{ marginBottom: 6 }}>Reciter</div>
+            <Select value={reciter?.key} onValueChange={(key) => setReciter(RECITERS.find(r => r.key === key))}>
+              <SelectTrigger data-testid="reciter-select" className="n-inset" style={{ borderRadius: 12 }}>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="n-card">
+                {RECITERS.map(r => (
+                  <SelectItem key={r.key} value={r.key} data-testid={`reciter-${r.key}`}>
+                    {r.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <div className="subtitle" style={{ marginTop: 8, marginBottom: 6 }}>Speed {speed.toFixed(1)}x</div>
             <Slider
               data-testid="speed-slider"
               min={0.5}
@@ -425,7 +438,6 @@ function SurahPage() {
               value={[speed]}
               onValueChange={(v) => setSpeed(v[0])}
             />
-            {/* Basic progress using timeupdate */}
             <div style={{ marginTop: 8 }}>
               <Progress data-testid="playback-progress" value={audioRef.current ? (audioRef.current.currentTime / (audioRef.current.duration || 1)) * 100 : 0} />
             </div>
