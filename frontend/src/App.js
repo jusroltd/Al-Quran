@@ -323,7 +323,7 @@ function SurahPage() {
               const active = currentAyah === enAyah.numberInSurah;
               const refProp = (query && isMatch && !firstMatchRef.current) ? { ref: firstMatchRef } : {};
               return (
-                <div key={enAyah.number} {...refProp} className={`n-inset ayah ${active ? 'skeleton' : ''}`} data-testid={`ayah-${enAyah.numberInSurah}`}>
+                <div key={enAyah.number} {...refProp} className={`n-inset ayah ${active ? 'ayah-active' : ''}`} data-testid={`ayah-${enAyah.numberInSurah}`}>
                   <div className="row">
                     <div>
                       <div className="arabic" dir="rtl">{arAyah.text}</div>
