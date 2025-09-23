@@ -414,7 +414,13 @@ function SurahPage() {
           <button className="n-btn icon-btn" onClick={toggle} data-testid="mini-player-toggle">
             {playing ? <Pause size={18} /> : <Play size={18} />}
           </button>
-          <div className="subtitle" style={{ minWidth: 160 }}>{playing ? 'Playing' : 'Paused'} · Mishary Al-Afasy</div>
+          <div className="subtitle" style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 220 }}>
+            {reciter ? (<Avatar className="n-inset" style={{ borderRadius: '50%' }}>
+              <AvatarImage src={reciter.img} alt={reciter.name} />
+              <AvatarFallback>{reciter.name?.slice(0,2).toUpperCase()}</AvatarFallback>
+            </Avatar>) : null}
+            <span>{playing ? 'Playing' : 'Paused'} · {reciter?.name || 'Mishary Al‑Afasy'}</span>
+          </div>
           <div style={{ width: 200 }}>
             <div className="subtitle" style={{ marginBottom: 6 }}>Reciter</div>
             <Select value={reciter?.key} onValueChange={(key) => setReciter(RECITERS.find(r => r.key === key))}>
