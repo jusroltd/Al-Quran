@@ -132,7 +132,7 @@ function useAudio() {
   const audioRef = useRef(null);
   const [playing, setPlaying] = useState(false);
   const [src, setSrc] = useState("");
-  const [speed, setSpeed] = useState(1);
+  const [speed, setSpeed] = useState(() => parseFloat(localStorage.getItem('quran.speed') || '1'));
 
   useEffect(() => {
     if (!audioRef.current) {
