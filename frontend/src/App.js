@@ -8,6 +8,7 @@ import { Switch } from "./components/ui/switch";
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "./components/ui/select";
 import { Progress } from "./components/ui/progress";
 import { Avatar, AvatarImage, AvatarFallback } from "./components/ui/avatar";
+import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "./components/ui/tooltip";
 
 // Top 20 Reciters (name, avatar, provider, code or match hint)
 const RECITERS = [
