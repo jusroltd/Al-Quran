@@ -267,6 +267,7 @@ function SurahPage() {
     load(audioUrl);
     play();
     setCurrentAyah(ayah.numberInSurah);
+    setLastGlobalAyah(ayah.number);
     preloadNext(ayah.numberInSurah);
   };
 
