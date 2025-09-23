@@ -313,6 +313,14 @@ function SurahPage() {
               onValueChange={(v) => setSpeed(v[0])}
             />
           </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <label className="subtitle" htmlFor="auto-scroll-switch">Auto-scroll</label>
+            <Switch id="auto-scroll-switch" checked={autoScroll} onCheckedChange={setAutoScroll} data-testid="auto-scroll-toggle" />
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <label className="subtitle" htmlFor="continuous-switch">Continuous</label>
+            <Switch id="continuous-switch" checked={continuous} onCheckedChange={setContinuous} data-testid="continuous-toggle" />
+          </div>
         </div>
       ) : null}
     </div>
