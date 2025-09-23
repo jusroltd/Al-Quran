@@ -352,7 +352,7 @@ function SurahPage() {
       )}
 
       {src ? (
-        <div className="n-card player" data-testid="mini-player">
+        <div className="n-card player" data-testid="mini-player" style={{ gap: 16 }}>
           <button className="n-btn icon-btn" onClick={toggle} data-testid="mini-player-toggle">
             {playing ? <Pause size={18} /> : <Play size={18} />}
           </button>
