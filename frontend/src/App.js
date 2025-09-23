@@ -199,11 +199,26 @@ function SurahPage() {
     return () => { mounted = false; };
   }, [api, number]);
 
+  const buildAudioUrl = (ayahNumberGlobal) => `https://cdn.islamic.network/quran/audio/128/ar.alafasy/${ayahNumberGlobal}.mp3`;
+
+  const preloadNext = (currNumberInSurah) => {
+    if (!english?.ayahs) return;
+    const idx = english.ayahs.findIndex(a => a.numberInSurah === currNumberInSurah);
+    const next = english.ayahs[idx + 1];
+    if (!next) { preloadedRef.current = null; return; }
+    const url = buildAudioUrl(next.number);
+    const el = new Audio();
+    el.preload = 'auto';
+    el.src = url;
+    preloadedRef.current = el;
+  };
+
   const onPlayAyah = (ayah) => {
-    const audioUrl = `https://cdn.islamic.network/quran/audio/128/ar.alafasy/${ayah.number}.mp3`;
+    const audioUrl = buildAudioUrl(ayah.number);
     load(audioUrl);
     play();
     setCurrentAyah(ayah.numberInSurah);
+    preloadNext(ayah.numberInSurah);
   };
 
   // auto-scroll to the active ayah while playing
