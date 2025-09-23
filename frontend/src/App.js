@@ -358,7 +358,7 @@ function SurahPage() {
             {playing ? <Pause size={18} /> : <Play size={18} />}
           </button>
           <div className="subtitle" style={{ minWidth: 160 }}>{playing ? 'Playing' : 'Paused'} · Mishary Al-Afasy</div>
-          <div style={{ width: 160 }}>
+          <div style={{ width: 200 }}>
             <div className="subtitle" style={{ marginBottom: 6 }}>Speed {speed.toFixed(1)}x</div>
             <Slider
               data-testid="speed-slider"
@@ -368,6 +368,10 @@ function SurahPage() {
               value={[speed]}
               onValueChange={(v) => setSpeed(v[0])}
             />
+            {/* Basic progress using timeupdate */}
+            <div style={{ marginTop: 8 }}>
+              <Progress data-testid="playback-progress" value={audioRef.current ? (audioRef.current.currentTime / (audioRef.current.duration || 1)) * 100 : 0} />
+            </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <label className="subtitle" htmlFor="auto-scroll-switch">Auto-scroll</label>
