@@ -152,10 +152,6 @@ function useAudio() {
     }
   }, [speed]);
 
-  // persist preferences
-  useEffect(() => { localStorage.setItem('quran.reciter', JSON.stringify(reciter)); }, [reciter]);
-  useEffect(() => { localStorage.setItem('quran.bitrate', bitrate); }, [bitrate]);
-
   const load = (url) => {
     if (!audioRef.current) audioRef.current = new Audio();
     if (src !== url) {
