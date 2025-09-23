@@ -263,6 +263,7 @@ function SurahPage() {
   };
 
   const onPlayAyah = (ayah) => {
+    // Always build URL with current reciter selection
     const audioUrl = buildAudioUrl(ayah.number);
     load(audioUrl);
     play();
