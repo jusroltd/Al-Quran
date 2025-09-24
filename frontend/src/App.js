@@ -275,29 +275,17 @@ function SurahPage() {
     return 'ar.alafasy';
   };
 
-  const buildAudioUrl = (ayahNumberGlobal) => {
-    const rate = bitrate === '64' ? '64' : '128';
-    if (!reciter) return `https://cdn.islamic.network/quran/audio/${rate}/ar.alafasy/${ayahNumberGlobal}.mp3`;
-    const codeHint = resolveIslamicCode(reciter);
-    if (codeHint) {
-      return `https://cdn.islamic.network/quran/audio/${rate}/${codeHint}/${ayahNumberGlobal}.mp3`;
-    }
-    if (reciter.everyayahCode) {
-      // needs 3-digit surah and ayah; we have global ayah number only here, but for per-ayah mapping we rely on arabic/english arrays
-      // We can compute 3-digit tokens using current surah context
-      const surahNum = english?.number || Number(number);
-      const surahStr = String(surahNum).padStart(3, '0');
-      // Find ayah within surah by global number
-      const item = english?.ayahs?.find(a => a.number === ayahNumberGlobal);
-      const ayahStr = String(item ? item.numberInSurah : 1).padStart(3, '0');
-      return `https://everyayah.com/data/${reciter.code}/${surahStr}${ayahStr}.mp3`;
-    }
-    if (reciter.provider === 'match-islamic') {
-      // map to closest known code from islamic.network by matching keyword
-      const hint = reciter.match || 'alafasy';
-      return `https://cdn.islamic.network/quran/audio/128/ar.${hint}/${ayahNumberGlobal}.mp3`;
-    }
-    return `https://cdn.islamic.network/quran/audio/128/ar.alafasy/${ayahNumberGlobal}.mp3`;
+  // Ask backend to resolve best URL across providers to ensure playback for all reciters
+  const buildAudioUrl = (ayahNumberGlobal, ayahInSurahOverride) => {
+    const surahNum = english?.number || Number(number);
+    const ayahInSurah = ayahInSurahOverride ?? (english?.ayahs?.find(a => a.number === ayahNumberGlobal)?.numberInSurah || 1);
+    return axios.post(`${API}/audio/resolve`, {
+      reciter_key: reciter?.key,
+      bitrate,
+      surah: surahNum,
+      ayah_in_surah: ayahInSurah,
+      global_ayah: ayahNumberGlobal,
+    }).then(r => r.data?.url).catch(() => null);
   };
 
   const preloadNext = (currNumberInSurah) => {
