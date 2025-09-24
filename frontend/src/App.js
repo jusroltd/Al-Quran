@@ -199,6 +199,8 @@ function SurahPage() {
   const [query, setQuery] = useState("");
   const firstMatchRef = useRef(null);
   const { audioRef, load, play, pause, playing, src, speed, setSpeed } = useAudio();
+  const [db, setDb] = useState(null);
+  useEffect(() => { (async () => setDb(await openAudioDB()))(); }, []);
   // preferences
   const [reciter, setReciter] = useState(() => {
     const saved = localStorage.getItem('quran.reciter');
