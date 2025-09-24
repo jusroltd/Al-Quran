@@ -388,6 +388,9 @@ function SurahPage() {
   const [, setTick] = useState(0);
   const [time, setTime] = useState({ cur: 0, dur: 0 });
   const [seekPreview, setSeekPreview] = useState(null);
+  const [seeking, setSeeking] = useState(false);
+  const [seekValue, setSeekValue] = useState(0);
+  const seekWrapRef = useRef(null);
   function fmt(t) {
     if (!t || !isFinite(t)) return '0:00';
     const m = Math.floor(t / 60);
