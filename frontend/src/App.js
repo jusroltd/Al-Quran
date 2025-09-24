@@ -581,29 +581,36 @@ function SurahPage() {
             </div>
             {/* Seekable progress via click/drag on a simple bar */}
             <div
+              ref={seekWrapRef}
               data-testid="seek-bar"
               className="n-inset"
-              style={{ height: 10, borderRadius: 8, position: 'relative', cursor: 'pointer', padding: 0, marginTop: 6 }}
+              style={{ height: 12, borderRadius: 8, position: 'relative', cursor: 'pointer', padding: 0, marginTop: 6 }}
               onMouseMove={(e) => {
                 const rect = e.currentTarget.getBoundingClientRect();
                 const p = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
                 const preview = (time.dur || 0) * p;
                 setSeekPreview({ x: e.clientX - rect.left, label: fmt(preview) });
+                if (seeking) setSeekValue(p);
               }}
-              onMouseLeave={() => setSeekPreview(null)}
+              onMouseLeave={() => { setSeekPreview(null); setSeeking(false); }}
               onMouseDown={(e) => {
                 if (!audioRef.current || !time.dur) return;
                 const rect = e.currentTarget.getBoundingClientRect();
                 const p = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
+                setSeeking(true); setSeekValue(p);
                 audioRef.current.currentTime = p * time.dur;
               }}
             >
               <div style={{ position: 'absolute', inset: 0, borderRadius: 8, background: 'rgba(6,95,70,0.15)' }} />
-              <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${(time.cur/(time.dur||1))*100}%`, background: 'rgba(6,95,70,0.5)', borderRadius: 8 }} />
+              <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${((seeking?seekValue:time.cur)/(time.dur||1))*100}%`, background: 'rgba(6,95,70,0.5)', borderRadius: 8 }} />
               {seekPreview ? (
-                <div style={{ position: 'absolute', left: Math.max(0, Math.min(seekPreview.x - 16, 240)), top: -24 }} className="badge-soft">{seekPreview.label}</div>
+                <div style={{ position: 'absolute', left: Math.max(0, Math.min(seekPreview.x - 18, 240)), top: -26 }} className="badge-soft">{seekPreview.label}</div>
               ) : null}
+              {/* Scrub handle */}
+              <div style={{ position: 'absolute', top: '50%', transform: 'translate(-50%, -50%)', left: `${((seeking?seekValue:time.cur)/(time.dur||1))*100}%`, width: 14, height: 14, borderRadius: 10, background: '#fff', boxShadow: '0 2px 6px rgba(0,0,0,0.25)' }} />
             </div>
+            {/* Complete dragging on mouse up globally */}
+            <div onMouseUp={() => setSeeking(false)} />
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <label className="subtitle" htmlFor="auto-scroll-switch">Auto-scroll</label>
