@@ -386,13 +386,25 @@ function SurahPage() {
 
   // force re-render to update progress bar periodically while playing
   const [, setTick] = useState(0);
+  const [time, setTime] = useState({ cur: 0, dur: 0 });
+  const [seekPreview, setSeekPreview] = useState(null);
+  function fmt(t) {
+    if (!t || !isFinite(t)) return '0:00';
+    const m = Math.floor(t / 60);
+    const s = Math.floor(t % 60);
+    return `${m}:${s.toString().padStart(2, '0')}`;
+  }
   useEffect(() => {
     let id;
-    if (playing) {
-      id = setInterval(() => setTick((t) => t + 1), 500);
+    if (audioRef.current) {
+      id = setInterval(() => {
+        const a = audioRef.current;
+        if (a && a.duration) setTime({ cur: a.currentTime || 0, dur: a.duration || 0 });
+        setTick((t) => t + 1);
+      }, 500);
     }
     return () => { if (id) clearInterval(id); };
-  }, [playing]);
+  }, [playing, audioRef]);
 
   return (
     <div className="container" data-testid="surah-page">
