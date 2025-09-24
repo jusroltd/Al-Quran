@@ -302,14 +302,16 @@ function SurahPage() {
     }
   };
 
-  const onPlayAyah = (ayah) => {
+  const onPlayAyah = async (ayah) => {
     // Always build URL with current reciter selection
-    const audioUrl = buildAudioUrl(ayah.number);
-    load(audioUrl);
-    play();
-    setCurrentAyah(ayah.numberInSurah);
-    setLastGlobalAyah(ayah.number);
-    preloadNext(ayah.numberInSurah);
+    const audioUrl = await buildAudioUrl(ayah.number);
+    if (audioUrl) {
+      load(audioUrl);
+      play();
+      setCurrentAyah(ayah.numberInSurah);
+      setLastGlobalAyah(ayah.number);
+      preloadNext(ayah.numberInSurah);
+    }
   };
 
   // auto-scroll to the active ayah while playing
