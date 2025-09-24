@@ -497,7 +497,10 @@ function SurahPage() {
                   window.qDownloadCtrl = {
                     pause: () => { paused = true; },
                     resume: () => { paused = false; },
-                    cancel: () => { canceled = true; },
+                    cancel: async () => {
+                      const ok = confirm('Cancel and abort current queue? Cached files remain.');
+                      if (ok) canceled = true;
+                    },
                   };
                   const total = jobs.length;
                   let done = 0;
