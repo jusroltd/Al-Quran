@@ -491,19 +491,47 @@ function SurahPage() {
               <div className="queue">
                 <button className="n-btn" data-testid="download-surah" onClick={async () => {
                   if (!db) return;
-                  const jobs = english.ayahs.slice(0, 50); // cap for MVP
+                  const full = confirm('Download full surah? (Cancel = first 50 ayahs)');
+                  const jobs = full ? english.ayahs : english.ayahs.slice(0, 50);
+                  let paused = false, canceled = false;
+                  window.qDownloadCtrl = {
+                    pause: () => { paused = true; },
+                    resume: () => { paused = false; },
+                    cancel: () => { canceled = true; },
+                  };
+                  const total = jobs.length;
+                  let done = 0;
                   for (const a of jobs) {
+                    if (canceled) break;
+                    while (paused) { await new Promise(r => setTimeout(r, 200)); }
                     const url = await buildAudioUrl(a.number, a.numberInSurah);
-                    if (!url) continue;
+                    if (!url) { done++; continue; }
                     try {
                       const res = await fetch(url);
                       const blob = await res.blob();
                       const key = `${reciter?.key||'alafasy'}:${bitrate}:${english.number}:${a.numberInSurah}`;
                       await putBlob(db, key, blob);
                     } catch (e) { console.warn('cache failed', e); }
+                    done++;
+                    const bar = document.querySelector('[data-testid="queue-progress"]');
+                    if (bar) bar.style.width = `${Math.round((done/total)*100)}%`;
+                    const label = document.querySelector('[data-testid="queue-label"]');
+                    if (label) label.textContent = `${done}/${total}`;
                   }
-                  alert('Download queue finished (first 50 ayahs cached).');
+                  alert(canceled ? 'Download canceled.' : 'Download complete.');
                 }}>Download Surah for Offline</button>
+                <div className="n-inset" style={{ padding: 6, borderRadius: 12 }}>
+                  <div className="subtitle" style={{ marginBottom: 4 }}>Queue</div>
+                  <div style={{ position: 'relative', width: 180, height: 8, background: 'rgba(6,95,70,0.15)', borderRadius: 8 }}>
+                    <div data-testid="queue-progress" style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '0%', background: 'rgba(6,95,70,0.6)', borderRadius: 8 }} />
+                  </div>
+                  <div className="subtitle" data-testid="queue-label">0/0</div>
+                  <div style={{ display: 'flex', gap: 6, marginTop: 6 }}>
+                    <button className="n-btn" onClick={() => window.qDownloadCtrl?.pause()} data-testid="queue-pause">Pause</button>
+                    <button className="n-btn" onClick={() => window.qDownloadCtrl?.resume()} data-testid="queue-resume">Resume</button>
+                    <button className="n-btn" onClick={() => window.qDownloadCtrl?.cancel()} data-testid="queue-cancel">Cancel</button>
+                  </div>
+                </div>
                 <button className="n-btn" data-testid="storage-count" onClick={async () => {
                   if (!db) return;
                   const prefix = `${reciter?.key||'alafasy'}:${bitrate}:${english.number}:`;
