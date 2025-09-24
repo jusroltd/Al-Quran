@@ -537,9 +537,17 @@ function SurahPage() {
                 </div>
                 <button className="n-btn" data-testid="storage-count" onClick={async () => {
                   if (!db) return;
+                  // Show count + estimated size
                   const prefix = `${reciter?.key||'alafasy'}:${bitrate}:${english.number}:`;
-                  const c = await countBlobs(db, prefix);
-                  alert(`Cached clips for this surah: ${c}`);
+                  let count = 0; let totalBytes = 0;
+                  await iterateKeys(db, prefix, (k, v) => { count++; totalBytes += v?.blob?.size || 0; });
+                  const mb = (totalBytes / (1024*1024)).toFixed(2);
+                  const msg = `Cached clips: ${count} (~${mb} MB).`;
+                  const clear = confirm(msg + '\nDo you want to clear this cache?');
+                  if (clear) {
+                    await clearPrefix(db, prefix);
+                    alert('Cache cleared for this surah/reciter/bitrate.');
+                  }
                 }}>Cache Info</button>
               </div>
             </div>
