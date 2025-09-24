@@ -35,11 +35,11 @@ body {
   letter-spacing: 0.06em;
   color: #0f172a;
   text-shadow:
-    0.5px 0.5px 0 #ffffff,
-    1px 1px 0 #dfe3ea,
-    2px 2px 0 #d1d9e6,
-    3px 3px 4px rgba(0,0,0,0.08);
-  animation: brandFloat 4s ease-in-out infinite;
+    0.4px 0.4px 0 #ffffff,
+    0.8px 0.8px 0 #e9eef5,
+    1.6px 1.6px 0 #d1d9e6,
+    3px 3px 6px rgba(0,0,0,0.06);
+  animation: brandFloat 5s ease-in-out infinite;
 }
 
 .brand-3d-lg {
@@ -48,11 +48,11 @@ body {
   letter-spacing: 0.08em;
   color: #0f172a;
   text-shadow:
-    1px 1px 0 #ffffff,
-    2px 2px 0 #e9eef5,
-    3px 3px 0 #d1d9e6,
-    6px 6px 12px rgba(0,0,0,0.08);
-  animation: brandFloat 5.5s ease-in-out infinite;
+    0.6px 0.6px 0 #ffffff,
+    1.2px 1.2px 0 #e9eef5,
+    2.4px 2.4px 0 #d1d9e6,
+    5px 5px 10px rgba(0,0,0,0.06);
+  animation: brandFloat 6s ease-in-out infinite;
 }
 
 @keyframes brandFloat {
