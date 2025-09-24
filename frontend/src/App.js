@@ -109,7 +109,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/app" element={<><Header /><SurahListPage /></>} />
-          <Route path="/surah/:number" element={<><Header /><Suspense fallback={<div className=\"container\">Loading…</div>}><SurahPage /></Suspense></>} />
+          <Route path="/surah/:number" element={<><Header /><Suspense fallback={<div className="container">Loading…</div>}><SurahPage /></Suspense></>} />
         </Routes>
       </BrowserRouter>
     </div>
