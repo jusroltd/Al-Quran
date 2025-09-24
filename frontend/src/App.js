@@ -138,7 +138,7 @@ function App() {
       <BrowserRouter>
         {/* Landing route */}
         <Routes>
-          <Route path="/" element={<LandingRouter />} />
+          <Route path="/" element={<Landing />} />
           <Route path="/app" element={<>
             <Header />
             <SurahListPage />
