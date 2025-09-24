@@ -76,3 +76,19 @@ export async function iterateKeys(db, prefix, onItem) {
     req.onerror = () => reject(req.error);
   });
 }
+
+export async function clearPrefix(db, prefix) {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction('audio_blobs', 'readwrite');
+    const store = tx.objectStore('audio_blobs');
+    const req = store.openCursor();
+    req.onsuccess = (e) => {
+      const cursor = e.target.result;
+      if (cursor) {
+        if (!prefix || String(cursor.key).startsWith(prefix)) store.delete(cursor.key);
+        cursor.continue();
+      } else resolve();
+    };
+    req.onerror = () => reject(req.error);
+  });
+}
