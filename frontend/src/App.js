@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import "./App.css";
 import { BrowserRouter, Routes, Route, Link, useNavigate, useParams } from "react-router-dom";
+import Landing from "./pages/Landing.jsx";
 import axios from "axios";
 import { Play, Pause, ChevronLeft } from "lucide-react";
 import { Slider } from "./components/ui/slider";
