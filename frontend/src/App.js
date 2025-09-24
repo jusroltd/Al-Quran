@@ -288,16 +288,18 @@ function SurahPage() {
     }).then(r => r.data?.url).catch(() => null);
   };
 
-  const preloadNext = (currNumberInSurah) => {
+  const preloadNext = async (currNumberInSurah) => {
     if (!english?.ayahs) return;
     const idx = english.ayahs.findIndex(a => a.numberInSurah === currNumberInSurah);
     const next = english.ayahs[idx + 1];
     if (!next) { preloadedRef.current = null; return; }
-    const url = buildAudioUrl(next.number);
-    const el = new Audio();
-    el.preload = 'auto';
-    el.src = url;
-    preloadedRef.current = el;
+    const url = await buildAudioUrl(next.number);
+    if (url) {
+      const el = new Audio();
+      el.preload = 'auto';
+      el.src = url;
+      preloadedRef.current = el;
+    }
   };
 
   const onPlayAyah = (ayah) => {
