@@ -28,6 +28,38 @@ body {
   font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
 }
 
+/* 3D animated brand style */
+.brand-3d {
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #0f172a;
+  text-shadow:
+    0.5px 0.5px 0 #ffffff,
+    1px 1px 0 #dfe3ea,
+    2px 2px 0 #d1d9e6,
+    3px 3px 4px rgba(0,0,0,0.08);
+  animation: brandFloat 4s ease-in-out infinite;
+}
+
+.brand-3d-lg {
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #0f172a;
+  text-shadow:
+    1px 1px 0 #ffffff,
+    2px 2px 0 #e9eef5,
+    3px 3px 0 #d1d9e6,
+    6px 6px 12px rgba(0,0,0,0.08);
+  animation: brandFloat 5.5s ease-in-out infinite;
+}
+
+@keyframes brandFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+
 .App {
   min-height: 100vh;
 }
