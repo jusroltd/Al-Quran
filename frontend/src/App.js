@@ -9,6 +9,7 @@ import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from ".
 import { Progress } from "./components/ui/progress";
 import { Avatar, AvatarImage, AvatarFallback } from "./components/ui/avatar";
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "./components/ui/tooltip";
+import { openAudioDB, putBlob, getBlob, countBlobs, iterateKeys } from "./utils/idb";
 
 // Top 20 Reciters (name, avatar, provider, code or match hint)
 const RECITERS = [
