@@ -27,7 +27,7 @@ export default function Landing() {
             <div className="n-inset" style={{ padding: 16, borderRadius: 16 }} data-testid="feat-1">• 100+ Reciters with per‑ayah playback</div>
             <div className="n-inset" style={{ padding: 16, borderRadius: 16 }} data-testid="feat-2">• In‑surah search, repeat, A–B loop, auto‑scroll</div>
             <div className="n-inset" style={{ padding: 16, borderRadius: 16 }} data-testid="feat-3">• Offline packs with queue &amp; cache meter</div>
-            <div className="n-inset" style={{ padding: 16, borderRadius: 16 }} data-testid="feat-4">• Neumorphic design with Arabic typography</div>
+            <div className="n-inset" style={{ padding: 16, borderRadius: 16 }} data-testid="feat-4"><span className="brand-3d">• Neumorphic design with Arabic typography</span></div>
           </div>
         </section>
 
