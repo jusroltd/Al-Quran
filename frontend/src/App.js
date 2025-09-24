@@ -467,12 +467,35 @@ function SurahPage() {
           </div>
 
           <div style={{ display: "grid", gap: 10 }}>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, alignItems: 'center' }}>
               <button className="n-btn" data-testid="jump-to-current" onClick={() => {
                 if (currentAyah == null) return;
                 const el = document.querySelector(`[data-testid="ayah-${currentAyah}"]`);
                 if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
               }}>Jump to Current</button>
+              <div className="queue">
+                <button className="n-btn" data-testid="download-surah" onClick={async () => {
+                  if (!db) return;
+                  const jobs = english.ayahs.slice(0, 50); // cap for MVP
+                  for (const a of jobs) {
+                    const url = await buildAudioUrl(a.number, a.numberInSurah);
+                    if (!url) continue;
+                    try {
+                      const res = await fetch(url);
+                      const blob = await res.blob();
+                      const key = `${reciter?.key||'alafasy'}:${bitrate}:${english.number}:${a.numberInSurah}`;
+                      await putBlob(db, key, blob);
+                    } catch (e) { console.warn('cache failed', e); }
+                  }
+                  alert('Download queue finished (first 50 ayahs cached).');
+                }}>Download Surah for Offline</button>
+                <button className="n-btn" data-testid="storage-count" onClick={async () => {
+                  if (!db) return;
+                  const prefix = `${reciter?.key||'alafasy'}:${bitrate}:${english.number}:`;
+                  const c = await countBlobs(db, prefix);
+                  alert(`Cached clips for this surah: ${c}`);
+                }}>Cache Info</button>
+              </div>
             </div>
             {english.ayahs.map((enAyah, i) => {
               const isMatch = matches.includes(enAyah.numberInSurah);
