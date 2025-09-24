@@ -278,11 +278,11 @@ function SurahPage() {
   const buildAudioUrl = (ayahNumberGlobal) => {
     const rate = bitrate === '64' ? '64' : '128';
     if (!reciter) return `https://cdn.islamic.network/quran/audio/${rate}/ar.alafasy/${ayahNumberGlobal}.mp3`;
-    if (reciter.provider === 'islamic' || reciter.provider === 'match-islamic') {
-      const code = resolveIslamicCode(reciter);
-      return `https://cdn.islamic.network/quran/audio/${rate}/${code}/${ayahNumberGlobal}.mp3`;
+    const codeHint = resolveIslamicCode(reciter);
+    if (codeHint) {
+      return `https://cdn.islamic.network/quran/audio/${rate}/${codeHint}/${ayahNumberGlobal}.mp3`;
     }
-    if (reciter.provider === 'everyayah') {
+    if (reciter.everyayahCode) {
       // needs 3-digit surah and ayah; we have global ayah number only here, but for per-ayah mapping we rely on arabic/english arrays
       // We can compute 3-digit tokens using current surah context
       const surahNum = english?.number || Number(number);
