@@ -219,13 +219,26 @@ function SurahPage() {
     setLoading(true);
     (async () => {
       try {
-        const [{ data: en }, { data: ar }] = await Promise.all([
+        const [{ data: en }, { data: ar }, { data: editions }] = await Promise.all([
           api.get(`/quran/surah/${number}?edition=en.asad`),
           api.get(`/quran/surah/${number}/arabic?edition=quran-uthmani`),
+          api.get(`/quran/editions`),
         ]);
         if (!mounted) return;
         setEnglish(en?.data);
         setArabic(ar?.data);
+        const audios = (editions?.data || editions)?.data || editions;
+        const onlyAudio = Array.isArray(audios) ? audios.filter(e => e.format === 'audio') : [];
+        setAudioEditions(onlyAudio);
+        // Build name/code map to islamic.network codes when available
+        const map = {};
+        onlyAudio.forEach(e => {
+          // e.identifier like ar.alafasy
+          map[(e.englishName || '').toLowerCase()] = e.identifier;
+          map[(e.name || '').toLowerCase()] = e.identifier;
+          map[(e.identifier || '').toLowerCase()] = e.identifier;
+        });
+        setEditionMap(map);
       } catch (e) {
         console.error("Failed to load surah", e);
       } finally {
