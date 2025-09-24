@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route, Link, useNavigate } from "react-router-do
 import axios from "axios";
 import { ChevronLeft } from "lucide-react";
 import Landing from "./pages/Landing.jsx";
+import { Logo3D } from "./components/Logo3D";
 
 const SurahPage = lazy(() => import('./pages/SurahPage.jsx'));
 
@@ -27,7 +28,8 @@ function Header() {
         <button aria-label="Back" className="n-btn icon-btn" data-testid="nav-back-button" onClick={() => navigate(-1)}>
           <ChevronLeft size={18} />
         </button>
-        <Link to="/" className="hidden-border" data-testid="brand-link" style={{ textDecoration: "none", color: "inherit" }}>
+        <Link to="/" className="hidden-border" data-testid="brand-link" style={{ textDecoration: "none", color: "inherit", display:'flex', alignItems:'center', gap:8 }}>
+          <Logo3D size={24} dataTestId="logo-3d-app" />
           <strong className="brand-3d">AL QURAN</strong>
         </Link>
       </div>

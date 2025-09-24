@@ -1,11 +1,15 @@
 import { Link } from "react-router-dom";
+import { Logo3D } from "../components/Logo3D";
 
 export default function Landing() {
   return (
     <div className="min-h-screen" style={{ background: 'var(--bg)' }}>
       <header className="header n-card container" data-testid="landing-header">
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div className="brand-3d">AL QURAN</div>
+          <div style={{ display:'flex', alignItems:'center', gap:10 }}>
+            <Logo3D size={32} dataTestId="logo-3d-header" />
+            <div className="brand-3d">AL QURAN</div>
+          </div>
           <div style={{ display: 'flex', gap: 10 }}>
             <Link to="/app" className="n-btn" data-testid="landing-open-app">Open App</Link>
           </div>
@@ -15,7 +19,10 @@ export default function Landing() {
       <main className="container" style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: 24 }}>
         <section className="n-card" style={{ padding: 28 }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            <h1 data-testid="landing-title" className="brand-3d-lg" style={{ margin: 0, fontSize: 48, lineHeight: '50px' }}>AL QURAN</h1>
+            <div style={{ display:'flex', alignItems:'center', gap:14 }}>
+              <Logo3D size={56} dataTestId="logo-3d-hero" />
+              <h1 data-testid="landing-title" className="brand-3d-lg" style={{ margin: 0, fontSize: 48, lineHeight: '50px' }}>AL QURAN</h1>
+            </div>
             <p className="subtitle" data-testid="landing-subtitle">Read the Quran with translations, tafsir, and high‑quality recitations. Soft 3D neumorphic UI. Offline packs. 100+ reciters.</p>
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
               <Link to="/app" className="n-btn" data-testid="get-started-btn">Get Started</Link>
@@ -51,7 +58,7 @@ export default function Landing() {
       </section>
 
       <footer className="container" style={{ marginTop: 28, marginBottom: 28, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div className="subtitle">© {new Date().getFullYear()} Quran Neumorph</div>
+        <div className="subtitle">© {new Date().getFullYear()} AL QURAN</div>
         <Link to="/app" className="n-btn" data-testid="footer-cta">Start Reading</Link>
       </footer>
     </div>
