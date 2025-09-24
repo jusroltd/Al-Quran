@@ -260,9 +260,9 @@ function SurahPage() {
 
   const resolveIslamicCode = (rec) => {
     if (!rec) return 'ar.alafasy';
-    // 1) direct code
-    if (rec.code && rec.provider === 'islamic') return rec.code;
-    // 2) dynamic map from /quran/editions
+    // 1) direct code from reciter record
+    if (rec.islamicCode) return rec.islamicCode;
+    // 2) dynamic map from /quran/editions by name or known hints
     const keys = [rec.name, rec.key, rec.match].filter(Boolean).map(normalize);
     for (const k of keys) {
       // try name match first
