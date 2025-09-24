@@ -15,7 +15,7 @@ export default function Landing() {
       <main className="container" style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: 24 }}>
         <section className="n-card" style={{ padding: 28 }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            <h1 data-testid="landing-title" style={{ margin: 0, fontSize: 42, lineHeight: '46px' }}>Quran Text &amp; Audio</h1>
+            <h1 data-testid="landing-title" className="brand-3d-lg" style={{ margin: 0, fontSize: 48, lineHeight: '50px' }}>AL QURAN</h1>
             <p className="subtitle" data-testid="landing-subtitle">Read the Quran with translations, tafsir, and high‑quality recitations. Soft 3D neumorphic UI. Offline packs. 100+ reciters.</p>
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
               <Link to="/app" className="n-btn" data-testid="get-started-btn">Get Started</Link>
