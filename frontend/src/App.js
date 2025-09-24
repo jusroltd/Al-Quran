@@ -211,6 +211,8 @@ function SurahPage() {
   const [bPoint, setBPoint] = useState(null);
   const preloadedRef = useRef(null); // next audio element for preload
   const [lastGlobalAyah, setLastGlobalAyah] = useState(null);
+  const [audioEditions, setAudioEditions] = useState([]);
+  const [editionMap, setEditionMap] = useState({});
 
   useEffect(() => {
     let mounted = true;
