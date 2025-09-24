@@ -189,6 +189,13 @@ body {
   border-radius: 50%;
 }
 
+.queue {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
 .hidden-border { border: none; background: transparent; }
 
 /* Skeleton shimmer */
