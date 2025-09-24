@@ -28,7 +28,7 @@ function Header() {
           <ChevronLeft size={18} />
         </button>
         <Link to="/" className="hidden-border" data-testid="brand-link" style={{ textDecoration: "none", color: "inherit" }}>
-          <strong>Quran • Neumorph</strong>
+          <strong className="brand-3d">AL QURAN</strong>
         </Link>
       </div>
     </div>
