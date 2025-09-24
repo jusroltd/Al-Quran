@@ -549,7 +549,7 @@ function SurahPage() {
             </Avatar>) : null}
             <span>{playing ? 'Playing' : 'Paused'} · {reciter?.name || 'Mishary Al‑Afasy'}</span>
           </div>
-          <div style={{ width: 200 }}>
+          <div style={{ width: 260 }}>
             <div className="subtitle" style={{ marginBottom: 6 }}>Reciter</div>
             <Select value={reciter?.key} onValueChange={(key) => setReciter(RECITERS.find(r => r.key === key))}>
               <SelectTrigger data-testid="reciter-select" className="n-inset" style={{ borderRadius: 12 }}>
@@ -572,8 +572,34 @@ function SurahPage() {
               value={[speed]}
               onValueChange={(v) => setSpeed(v[0])}
             />
-            <div style={{ marginTop: 8 }}>
-              <Progress data-testid="playback-progress" value={audioRef.current ? (audioRef.current.currentTime / (audioRef.current.duration || 1)) * 100 : 0} />
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6 }}>
+              <span className="subtitle">{fmt(time.cur)}</span>
+              <span className="subtitle">{fmt(time.dur)}</span>
+            </div>
+            {/* Seekable progress via click/drag on a simple bar */}
+            <div
+              data-testid="seek-bar"
+              className="n-inset"
+              style={{ height: 10, borderRadius: 8, position: 'relative', cursor: 'pointer', padding: 0, marginTop: 6 }}
+              onMouseMove={(e) => {
+                const rect = e.currentTarget.getBoundingClientRect();
+                const p = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
+                const preview = (time.dur || 0) * p;
+                setSeekPreview({ x: e.clientX - rect.left, label: fmt(preview) });
+              }}
+              onMouseLeave={() => setSeekPreview(null)}
+              onMouseDown={(e) => {
+                if (!audioRef.current || !time.dur) return;
+                const rect = e.currentTarget.getBoundingClientRect();
+                const p = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
+                audioRef.current.currentTime = p * time.dur;
+              }}
+            >
+              <div style={{ position: 'absolute', inset: 0, borderRadius: 8, background: 'rgba(6,95,70,0.15)' }} />
+              <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${(time.cur/(time.dur||1))*100}%`, background: 'rgba(6,95,70,0.5)', borderRadius: 8 }} />
+              {seekPreview ? (
+                <div style={{ position: 'absolute', left: Math.max(0, Math.min(seekPreview.x - 16, 240)), top: -24 }} className="badge-soft">{seekPreview.label}</div>
+              ) : null}
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
