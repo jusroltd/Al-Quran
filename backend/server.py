@@ -91,6 +91,12 @@ async def list_editions():
     return data
 
 
+@api_router.get("/quran/editions/audio")
+async def list_audio_editions():
+    data = await fetch_json(f"{AL_QURAN_BASE}/edition/format/audio")
+    return data
+
+
 @api_router.get("/quran/surahs")
 async def list_surahs():
     data = await fetch_json(f"{AL_QURAN_BASE}/surah")
@@ -117,6 +123,93 @@ async def get_surah_arabic(number: int, edition: str = "quran-uthmani"):
 async def get_ayah(global_number: int, edition: str = "en.asad"):
     data = await fetch_json(f"{AL_QURAN_BASE}/ayah/{global_number}/{edition}")
     return data
+
+
+# Audio resolution helper
+class AudioResolveRequest(BaseModel):
+    reciter_key: str
+    bitrate: str = "128"  # "64" or "128" for islamic.network
+    surah: int
+    ayah_in_surah: int
+    global_ayah: int
+
+
+# A pragmatic map of EveryAyah folder names and Islamic Network codes
+RECITER_AUDIO_MAP = {
+    "alafasy": {"islamic": "ar.alafasy"},
+    "sudais": {"islamic": "ar.sudais", "everyayah": ["Abdurrahmaan_As-Sudais_192kbps", "Abdurrahmaan_As-Sudais_64kbps"]},
+    "shuraim": {"islamic": "ar.shuraim", "everyayah": ["Saood_ash-Shuraym_128kbps"]},
+    "abdullah-awad": {"islamic": "ar.juhany", "everyayah": ["Abdullah_Al-Juhany_128kbps"]},
+    "ghamdi": {"islamic": "ar.ghamdi", "everyayah": ["Saad_al-Ghamdi_128kbps"]},
+    "dosari": {"islamic": "ar.yasser", "everyayah": ["Yasser_Ad-Dussary_128kbps"]},
+    "maher": {"islamic": "ar.maher", "everyayah": ["Maher_AlMuaiqly_64kbps", "Maher_AlMuaiqly_128kbps"]},
+    "hudhaify-ali": {"islamic": "ar.hudhaifi", "everyayah": ["Hudhaify_128kbps", "Ali_Huzaifi_128kbps"]},
+    "budair": {"islamic": "ar.budair"},
+    "abdul-basit": {"islamic": "ar.abdulbasit", "everyayah": ["Abdul_Basit_Murattal_128kbps", "Abdul_Basit_Murattal_192kbps"]},
+    "minshawi": {"islamic": "ar.minshawi", "everyayah": ["Minshawi_Murattal_128kbps"]},
+    "hussary": {"everyayah": ["Husary_128kbps", "Hussary_128kbps"]},
+    "mustafa-ismail": {"everyayah": ["MustafaIsmail_128kbps", "Mustafa_Ismail_48kbps"]},
+    "ayyub": {"everyayah": ["Muhammad_Ayyoub_128kbps", "Muhammad_Ayyub_128kbps"]},
+    "ajamy": {"everyayah": ["Ahmed_ibn_Ali_al-Ajmy_128kbps", "Ahmed_ibn_Ali_Al-Ajamy_64kbps", "Ajamy_128kbps"]},
+    "muhammad-rifat": {"everyayah": ["Muhammad_Rifat_192kbps"]},
+    "mohamed-salamah": {"everyayah": ["Muhammad_Salamah_128kbps"]},
+    "basfar": {"islamic": "ar.basfar", "everyayah": ["Basfar_192kbps", "Abdullah_Basfar_192kbps"]},
+    "bahtimi": {"everyayah": ["Kamel_Youssef_El-Bahtimi_128kbps", "Kamel_Youssef_El-Bahtimi_64kbps"]},
+    "abdulrahman-huthaify": {"islamic": "ar.hudhaifi", "everyayah": ["Hudhaify_128kbps"]},
+}
+
+
+async def url_ok(url: str) -> bool:
+    timeout = httpx.Timeout(8.0, connect=5.0)
+    async with httpx.AsyncClient(timeout=timeout) as client_http:
+        try:
+            r = await client_http.head(url)
+            if r.status_code == 200:
+                return True
+            # some CDNs don't support HEAD
+            r = await client_http.get(url, headers={"Range": "bytes=0-1"})
+            return r.status_code in (200, 206)
+        except Exception:
+            return False
+
+
+@api_router.post("/audio/resolve")
+async def resolve_audio(req: AudioResolveRequest):
+    # 1) try islamic.network if code known
+    rate = req.bitrate if req.bitrate in ("64", "128") else "128"
+    mapping = RECITER_AUDIO_MAP.get(req.reciter_key, {})
+    isl_code = mapping.get("islamic")
+    if isl_code:
+        url = f"https://cdn.islamic.network/quran/audio/{rate}/{isl_code}/{req.global_ayah}.mp3"
+        if await url_ok(url):
+            return {"url": url}
+
+    # 2) try EveryAyah candidates
+    s3 = f"{req.surah:03d}"
+    a3 = f"{req.ayah_in_surah:03d}"
+    for folder in mapping.get("everyayah", []):
+        url = f"https://everyayah.com/data/{folder}/{s3}{a3}.mp3"
+        if await url_ok(url):
+            return {"url": url}
+
+    # 3) broader fallbacks
+    # common generic folders
+    common_folders = [
+        "Saad_al-Ghamdi_128kbps",
+        "Abdurrahmaan_As-Sudais_192kbps",
+        "Saood_ash-Shuraym_128kbps",
+        "Minshawi_Murattal_128kbps",
+        "Husary_128kbps",
+        "Ahmed_ibn_Ali_al-Ajmy_128kbps",
+    ]
+    for folder in common_folders:
+        url = f"https://everyayah.com/data/{folder}/{s3}{a3}.mp3"
+        if await url_ok(url):
+            return {"url": url}
+
+    # 4) last resort: Alafasy
+    fallback = f"https://cdn.islamic.network/quran/audio/{rate}/ar.alafasy/{req.global_ayah}.mp3"
+    return {"url": fallback}
 
 
 # Include the router in the main app
