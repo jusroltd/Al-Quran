@@ -5,7 +5,7 @@ export default function Landing() {
     <div className="min-h-screen" style={{ background: 'var(--bg)' }}>
       <header className="header n-card container" data-testid="landing-header">
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ fontWeight: 700 }}>Quran • Neumorph</div>
+          <div className="brand-3d">AL QURAN</div>
           <div style={{ display: 'flex', gap: 10 }}>
             <Link to="/app" className="n-btn" data-testid="landing-open-app">Open App</Link>
           </div>
