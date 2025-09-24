@@ -610,6 +610,18 @@ function SurahPage() {
             {/* Seekable progress via click/drag on a simple bar */}
             <div
               ref={seekWrapRef}
+              role="slider"
+              aria-valuemin={0}
+              aria-valuemax={time.dur || 0}
+              aria-valuenow={time.cur || 0}
+              aria-label="Seek"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (!audioRef.current || !time.dur) return;
+                const step = e.shiftKey ? 10 : 5;
+                if (e.key === 'ArrowRight') { audioRef.current.currentTime = Math.min(time.dur, (audioRef.current.currentTime || 0) + step); }
+                if (e.key === 'ArrowLeft') { audioRef.current.currentTime = Math.max(0, (audioRef.current.currentTime || 0) - step); }
+              }}
               data-testid="seek-bar"
               className="n-inset"
               style={{ height: 12, borderRadius: 8, position: 'relative', cursor: 'pointer', padding: 0, marginTop: 6 }}
