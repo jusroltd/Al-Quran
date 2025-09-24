@@ -256,11 +256,31 @@ function SurahPage() {
   useEffect(() => { localStorage.setItem('quran.continuous', String(continuous)); }, [continuous]);
   useEffect(() => { localStorage.setItem('quran.bitrate', bitrate); }, [bitrate]);
 
+  const normalize = (s) => (s || '').toLowerCase().replace(/[-_.]/g, ' ').replace(/\s+/g, ' ').trim();
+
+  const resolveIslamicCode = (rec) => {
+    if (!rec) return 'ar.alafasy';
+    // 1) direct code
+    if (rec.code && rec.provider === 'islamic') return rec.code;
+    // 2) dynamic map from /quran/editions
+    const keys = [rec.name, rec.key, rec.match].filter(Boolean).map(normalize);
+    for (const k of keys) {
+      // try name match first
+      for (const edName in editionMap) {
+        if (normalize(edName).includes(k)) return editionMap[edName];
+      }
+    }
+    // 3) fallback guessed ar.<match>
+    if (rec.match) return `ar.${rec.match}`;
+    return 'ar.alafasy';
+  };
+
   const buildAudioUrl = (ayahNumberGlobal) => {
     const rate = bitrate === '64' ? '64' : '128';
     if (!reciter) return `https://cdn.islamic.network/quran/audio/${rate}/ar.alafasy/${ayahNumberGlobal}.mp3`;
-    if (reciter.provider === 'islamic') {
-      return `https://cdn.islamic.network/quran/audio/${rate}/${reciter.code}/${ayahNumberGlobal}.mp3`;
+    if (reciter.provider === 'islamic' || reciter.provider === 'match-islamic') {
+      const code = resolveIslamicCode(reciter);
+      return `https://cdn.islamic.network/quran/audio/${rate}/${code}/${ayahNumberGlobal}.mp3`;
     }
     if (reciter.provider === 'everyayah') {
       // needs 3-digit surah and ayah; we have global ayah number only here, but for per-ayah mapping we rely on arabic/english arrays
