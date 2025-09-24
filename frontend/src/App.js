@@ -154,9 +154,7 @@ function App() {
 }
 
 function LandingRouter() {
-  // Lazy import replacement for simplicity in MVP
-  const L = require('./pages/Landing.jsx').default;
-  return <L />;
+  return <Landing />;
 }
 
 export default App;
